@@ -1,0 +1,117 @@
+<main class="shell">
+  <section class="workspace">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Employee service</p>
+        <h1>Employee Console</h1>
+      </div>
+      <div class="status" [class.busy]="loading()">
+        <span></span>
+        {{ loading() ? 'Working' : status() }}
+      </div>
+    </header>
+
+    @if (error()) {
+      <p class="alert">{{ error() }}</p>
+    }
+
+    <div class="content-grid">
+      <form class="panel form-panel" (ngSubmit)="saveEmployee()">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Create or edit</p>
+            <h2>Employee details</h2>
+          </div>
+          <button class="icon-button" type="button" title="Clear form" (click)="resetForm()">Reset</button>
+        </div>
+
+        <label>
+          <span>Employee ID</span>
+          <input type="number" name="id" [(ngModel)]="employeeForm.id" placeholder="Auto for new" />
+        </label>
+
+        <label>
+          <span>Name</span>
+          <input type="text" name="name" [(ngModel)]="employeeForm.name" required />
+        </label>
+
+        <label>
+          <span>Email</span>
+          <input type="email" name="email" [(ngModel)]="employeeForm.email" required />
+        </label>
+
+        <div class="section-title">Address</div>
+
+        <label>
+          <span>Street address</span>
+          <textarea name="address" [(ngModel)]="employeeForm.addresses.address" rows="3"></textarea>
+        </label>
+
+        <div class="field-row">
+          <label>
+            <span>City</span>
+            <input type="text" name="city" [(ngModel)]="employeeForm.addresses.city" />
+          </label>
+
+          <label>
+            <span>Pincode</span>
+            <input type="text" name="pincode" [(ngModel)]="employeeForm.addresses.pincode" />
+          </label>
+        </div>
+
+        <label>
+          <span>Phone number</span>
+          <input type="tel" name="phoneNumber" [(ngModel)]="employeeForm.addresses.phoneNumber" />
+        </label>
+
+        <div class="actions">
+          <button type="submit" [disabled]="loading()">Save</button>
+          <button class="secondary" type="button" [disabled]="loading()" (click)="updateEmployee()">Update</button>
+        </div>
+      </form>
+
+      <section class="panel lookup-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Lookup</p>
+            <h2>Employee with addresses</h2>
+          </div>
+          <strong>{{ addressCount() }}</strong>
+        </div>
+
+        <div class="search-row">
+          <input type="number" name="lookupId" [(ngModel)]="lookupId" placeholder="Employee ID" />
+          <button type="button" [disabled]="loading()" (click)="findEmployee()">Find</button>
+        </div>
+
+        @if (employee(); as item) {
+          <article class="employee-card">
+            <div>
+              <p class="eyebrow">#{{ item.id }}</p>
+              <h3>{{ item.name }}</h3>
+              <a [href]="'mailto:' + item.email">{{ item.email }}</a>
+            </div>
+            <button class="secondary" type="button" (click)="loadIntoForm()">Edit</button>
+          </article>
+
+          <div class="address-list">
+            @for (address of item.addresses; track address.id ?? address.phoneNumber) {
+              <article class="address-card">
+                <strong>{{ address.city || 'No city' }}</strong>
+                <p>{{ address.address || 'No street address' }}</p>
+                <span>{{ address.pincode || 'No pincode' }} | {{ address.phoneNumber || 'No phone' }}</span>
+              </article>
+            } @empty {
+              <p class="empty">No addresses returned for this employee.</p>
+            }
+          </div>
+        } @else {
+          <div class="empty-state">
+            <h3>No employee loaded</h3>
+            <p>Search by ID to view an employee and the addresses returned by the service.</p>
+          </div>
+        }
+      </section>
+    </div>
+  </section>
+</main>
