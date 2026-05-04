@@ -112,6 +112,53 @@
           </div>
         }
       </section>
+
+      <section class="panel address-count-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">Address service</p>
+            <h2>Employee by address count</h2>
+          </div>
+        </div>
+
+        <div class="search-row">
+          <input
+            type="number"
+            min="1"
+            name="minimumAddressCount"
+            [(ngModel)]="minimumAddressCount"
+            placeholder="Address count"
+          />
+          <button type="button" [disabled]="loading()" (click)="findEmployeeByAddressCount()">
+            Find
+          </button>
+        </div>
+
+        @if (employeeByAddressCount(); as item) {
+          <article class="employee-card">
+            <div>
+              <p class="eyebrow">#{{ item.id }}</p>
+              <h3>{{ item.name }}</h3>
+              <a [href]="'mailto:' + item.email">{{ item.email }}</a>
+            </div>
+          </article>
+
+          @if (item.addresses; as address) {
+            <article class="address-card result-address">
+              <strong>{{ address.city || 'No city' }}</strong>
+              <p>{{ address.address || 'No street address' }}</p>
+              <span>{{ address.pincode || 'No pincode' }} | {{ address.phoneNumber || 'No phone' }}</span>
+            </article>
+          } @else {
+            <p class="empty">Employee returned without an address object.</p>
+          }
+        } @else {
+          <div class="empty-state compact">
+            <h3>No count lookup yet</h3>
+            <p>Enter a count to load the employee returned from the Address service.</p>
+          </div>
+        }
+      </section>
     </div>
   </section>
 </main>

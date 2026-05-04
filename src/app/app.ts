@@ -1,6 +1,7 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { AddressService, EmployeeAddressResult } from './address.service';
+import { EmployeePayload, EmployeeService, EmployeeWithAddress } from './employee.service';
 
 @Component({
   selector: 'app-root',
@@ -9,13 +10,14 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './app.css'
 })
 export class App {
-  private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8080/employees';
+  private readonly addressService = inject(AddressService);
+  private readonly employeeService = inject(EmployeeService);
 
   protected readonly status = signal('Ready');
   protected readonly error = signal('');
   protected readonly loading = signal(false);
   protected readonly employee = signal<EmployeeWithAddress | null>(null);
+  protected readonly employeeByAddressCount = signal<EmployeeAddressResult | null>(null);
   protected readonly addressCount = computed(() => this.employee()?.addresses?.length ?? 0);
 
   protected employeeForm: EmployeePayload = {
@@ -31,13 +33,14 @@ export class App {
   };
 
   protected lookupId: number | null = null;
+  protected minimumAddressCount = 1;
 
   protected saveEmployee(): void {
-    this.request('post', `${this.apiUrl}/save`, this.employeeForm, 'Employee saved');
+    this.request(this.employeeService.saveEmployee(this.employeeForm), 'Employee saved');
   }
 
   protected updateEmployee(): void {
-    this.request('put', `${this.apiUrl}/update`, this.employeeForm, 'Employee updated');
+    this.request(this.employeeService.updateEmployee(this.employeeForm), 'Employee updated');
   }
 
   protected findEmployee(): void {
@@ -48,7 +51,7 @@ export class App {
 
     this.loading.set(true);
     this.error.set('');
-    this.http.get<EmployeeWithAddress>(`${this.apiUrl}/${this.lookupId}/with-addresses`).subscribe({
+    this.employeeService.getEmployeeWithAddresses(this.lookupId).subscribe({
       next: (employee) => {
         this.employee.set(employee);
         this.status.set(`Loaded employee ${employee.id}`);
@@ -56,6 +59,28 @@ export class App {
       },
       error: () => {
         this.error.set('Employee not found or the API is unavailable.');
+        this.loading.set(false);
+      }
+    });
+  }
+
+  protected findEmployeeByAddressCount(): void {
+    if (!this.minimumAddressCount || this.minimumAddressCount < 1) {
+      this.error.set('Enter an address count greater than zero.');
+      return;
+    }
+
+    this.loading.set(true);
+    this.error.set('');
+
+    this.addressService.getEmployeeByMoreThanOneAddress(this.minimumAddressCount).subscribe({
+      next: (employee) => {
+        this.employeeByAddressCount.set(employee);
+        this.status.set(`Loaded employee with more than ${this.minimumAddressCount} address`);
+        this.loading.set(false);
+      },
+      error: () => {
+        this.error.set('No employee found for that address count, or the Address API is unavailable.');
         this.loading.set(false);
       }
     });
@@ -96,19 +121,9 @@ export class App {
     this.status.set('Ready');
   }
 
-  private request(
-    method: 'post' | 'put',
-    url: string,
-    payload: EmployeePayload,
-    successMessage: string
-  ): void {
+  private request(request: ReturnType<EmployeeService['saveEmployee']>, successMessage: string): void {
     this.loading.set(true);
     this.error.set('');
-
-    const request =
-      method === 'post'
-        ? this.http.post<EmployeePayload>(url, payload)
-        : this.http.put<EmployeePayload>(url, payload);
 
     request.subscribe({
       next: (saved) => {
@@ -123,27 +138,4 @@ export class App {
       }
     });
   }
-}
-
-interface Address {
-  id?: string;
-  city: string;
-  pincode: string;
-  address: string;
-  phoneNumber: string;
-  employeeID?: string;
-}
-
-interface EmployeePayload {
-  id: number | null;
-  name: string;
-  email: string;
-  addresses: Address;
-}
-
-interface EmployeeWithAddress {
-  id: number;
-  name: string;
-  email: string;
-  addresses: Address[];
 }
