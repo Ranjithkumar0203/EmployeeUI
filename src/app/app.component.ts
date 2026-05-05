@@ -1,7 +1,16 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AddressService, EmployeeAddressResult } from './address.service';
 import { EmployeePayload, EmployeeService, EmployeeWithAddress } from './employee.service';
+
+interface ApiErrorResponse {
+  timestamp?: string;
+  status?: number;
+  error?: string;
+  message?: string;
+}
 
 @Component({
   selector: 'app-root',
@@ -12,12 +21,13 @@ import { EmployeePayload, EmployeeService, EmployeeWithAddress } from './employe
 export class App {
   private readonly addressService = inject(AddressService);
   private readonly employeeService = inject(EmployeeService);
+  private readonly snackBar = inject(MatSnackBar);
 
   protected readonly status = signal('Ready');
   protected readonly error = signal('');
   protected readonly loading = signal(false);
   protected readonly employee = signal<EmployeeWithAddress | null>(null);
-  protected readonly employeeByAddressCount = signal<EmployeeAddressResult | null>(null);
+  protected readonly employeeByAddressCount = signal<EmployeeAddressResult[]>([]);
   protected readonly addressCount = computed(() => this.employee()?.addresses?.length ?? 0);
 
   protected employeeForm: EmployeePayload = {
@@ -57,8 +67,8 @@ export class App {
         this.status.set(`Loaded employee ${employee.id}`);
         this.loading.set(false);
       },
-      error: () => {
-        this.error.set('Employee not found or the API is unavailable.');
+      error: (error: unknown) => {
+        this.handleRequestError(error, 'Employee not found or the API is unavailable.');
         this.loading.set(false);
       }
     });
@@ -79,8 +89,11 @@ export class App {
         this.status.set(`Loaded employee with more than ${this.minimumAddressCount} address`);
         this.loading.set(false);
       },
-      error: () => {
-        this.error.set('No employee found for that address count, or the Address API is unavailable.');
+      error: (error: unknown) => {
+        this.handleRequestError(
+          error,
+          'No employee found for that address count, or the Address API is unavailable.'
+        );
         this.loading.set(false);
       }
     });
@@ -132,10 +145,52 @@ export class App {
         this.status.set(successMessage);
         this.loading.set(false);
       },
-      error: () => {
-        this.error.set('Save failed. Check that the Employee API and Address API are running.');
+      error: (error: unknown) => {
+        this.handleRequestError(
+          error,
+          'Save failed. Check that the Employee API and Address API are running.'
+        );
         this.loading.set(false);
       }
     });
+  }
+
+  private handleRequestError(error: unknown, fallbackMessage: string): void {
+    const message = this.getErrorMessage(error, fallbackMessage);
+    this.error.set(message);
+    this.showToast(message, 'error-toast');
+  }
+
+  private showToast(message: string, panelClass: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      horizontalPosition: 'right',
+      verticalPosition: 'top',
+      panelClass
+    });
+  }
+
+  private getErrorMessage(error: unknown, fallbackMessage: string): string {
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 0) {
+        return 'Unable to connect to the API. Please check that the service is running.';
+      }
+
+      const apiError = error.error as ApiErrorResponse | string | null;
+
+      if (typeof apiError === 'string') {
+        return apiError.trim() || fallbackMessage;
+      }
+
+      if (apiError?.message?.trim()) {
+        return apiError.message;
+      }
+
+      if (apiError?.error?.trim()) {
+        return apiError.error;
+      }
+    }
+
+    return fallbackMessage;
   }
 }

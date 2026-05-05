@@ -134,23 +134,27 @@
           </button>
         </div>
 
-        @if (employeeByAddressCount(); as item) {
-          <article class="employee-card">
-            <div>
-              <p class="eyebrow">#{{ item.id }}</p>
-              <h3>{{ item.name }}</h3>
-              <a [href]="'mailto:' + item.email">{{ item.email }}</a>
-            </div>
-          </article>
-
-          @if (item.addresses; as address) {
-            <article class="address-card result-address">
-              <strong>{{ address.city || 'No city' }}</strong>
-              <p>{{ address.address || 'No street address' }}</p>
-              <span>{{ address.pincode || 'No pincode' }} | {{ address.phoneNumber || 'No phone' }}</span>
+        @if (employeeByAddressCount().length) {
+          @for (item of employeeByAddressCount(); track item.id) {
+            <article class="employee-card">
+              <div>
+                <p class="eyebrow">#{{ item.id }}</p>
+                <h3>{{ item.name }}</h3>
+                <a [href]="'mailto:' + item.email">{{ item.email }}</a>
+              </div>
             </article>
-          } @else {
-            <p class="empty">Employee returned without an address object.</p>
+
+            @if (item.addresses?.length) {
+              @for (address of item.addresses; track address.id) {
+                <article class="address-card result-address">
+                  <strong>{{ address.city || 'No city' }}</strong>
+                  <p>{{ address.address || 'No street address' }}</p>
+                  <span>{{ address.pincode || 'No pincode' }} | {{ address.phoneNumber || 'No phone' }}</span>
+                </article>
+              }
+            } @else {
+              <p class="empty">Employee returned without address objects.</p>
+            }
           }
         } @else {
           <div class="empty-state compact">

@@ -1,1 +1,9 @@
+@import '@angular/material/prebuilt-themes/azure-blue.css';
+
 /* You can add global styles to this file, and also import other style files */
+
+.error-toast {
+  --mdc-snackbar-container-color: #9f2f22;
+  --mdc-snackbar-supporting-text-color: #ffffff;
+  --mat-snack-bar-button-color: #ffffff;
+}
