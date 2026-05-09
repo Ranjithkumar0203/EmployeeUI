@@ -4,6 +4,9 @@ https://github.com/Ranjithkumar0203/Employee
 https://github.com/Ranjithkumar0203/Address
 https://github.com/Ranjithkumar0203/EmployeeWorkLocation
 
+Eureka Server
+https://github.com/Ranjithkumar0203/EurekaServer
+
 
 # Library Creation
 https://github.com/Ranjithkumar0203/SpringExceptionLibrary
