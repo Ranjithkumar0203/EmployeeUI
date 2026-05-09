@@ -39,6 +39,14 @@ export class App {
       pincode: '',
       address: '',
       phoneNumber: ''
+    },
+    workLocation: {
+      id: null,
+      locationName: '',
+      city: '',
+      state: '',
+      country: '',
+      pincode: ''
     }
   };
 
@@ -114,7 +122,8 @@ export class App {
         pincode: '',
         address: '',
         phoneNumber: ''
-      }
+      },
+      workLocation: this.employeeForm.workLocation
     };
   }
 
@@ -128,6 +137,14 @@ export class App {
         pincode: '',
         address: '',
         phoneNumber: ''
+      },
+      workLocation: {
+        id: null,
+        locationName: '',
+        city: '',
+        state: '',
+        country: '',
+        pincode: ''
       }
     };
     this.error.set('');
