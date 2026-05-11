@@ -7,6 +7,8 @@ https://github.com/Ranjithkumar0203/EmployeeWorkLocation
 Eureka Server
 https://github.com/Ranjithkumar0203/EurekaServer
 
+API Gateway
+https://github.com/Ranjithkumar0203/APIGateway
 
 # Library Creation
 https://github.com/Ranjithkumar0203/SpringExceptionLibrary
