@@ -64,6 +64,47 @@
           <input type="tel" name="phoneNumber" [(ngModel)]="employeeForm.addresses.phoneNumber" />
         </label>
 
+        <div class="section-title">Work location</div>
+
+        <label>
+          <span>Location name</span>
+          <input type="text" name="locationName" [(ngModel)]="employeeForm.workLocation.locationName" />
+        </label>
+
+        <div class="field-row">
+          <label>
+            <span>City</span>
+            <input type="text" name="workLocationCity" [(ngModel)]="employeeForm.workLocation.city" />
+          </label>
+
+          <label>
+            <span>State</span>
+            <input type="text" name="workLocationState" [(ngModel)]="employeeForm.workLocation.state" />
+          </label>
+        </div>
+
+        <div class="field-row">
+          <label>
+            <span>Country</span>
+            <input type="text" name="workLocationCountry" [(ngModel)]="employeeForm.workLocation.country" />
+          </label>
+
+          <label>
+            <span>Pincode</span>
+            <input type="text" name="workLocationPincode" [(ngModel)]="employeeForm.workLocation.pincode" />
+          </label>
+        </div>
+
+        <label>
+          <span>Work location employee ID</span>
+          <input
+            type="text"
+            name="workLocationEmployeeId"
+            [(ngModel)]="employeeForm.workLocation.employeeId"
+            disabled
+          />
+        </label>
+
         <div class="actions">
           <button type="submit" [disabled]="loading()">Save</button>
           <button class="secondary" type="button" [disabled]="loading()" (click)="updateEmployee()">Update</button>

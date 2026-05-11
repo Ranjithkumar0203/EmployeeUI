@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class AddressService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:8081/address';
+  private readonly apiUrl = 'http://localhost:8080/address';
 
   getEmployeeByMoreThanOneAddress(count: number): Observable<EmployeeAddressResult[]> {
     return this.http.get<EmployeeAddressResult[]>(`${this.apiUrl}/${count}`);

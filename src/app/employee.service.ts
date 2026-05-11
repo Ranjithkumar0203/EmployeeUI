@@ -11,11 +11,22 @@ export interface EmployeeAddress {
   employeeID?: string;
 }
 
+export interface EmployeeWorkLocation {
+  id?: number | null;
+  locationName: string;
+  city: string;
+  state: string;
+  country: string;
+  pincode: string;
+  employeeId?: string;
+}
+
 export interface EmployeePayload {
   id: number | null;
   name: string;
   email: string;
   addresses: EmployeeAddress;
+  workLocation: EmployeeWorkLocation;
 }
 
 export interface EmployeeWithAddress {
